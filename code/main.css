@@ -1,0 +1,64 @@
+@font-face {
+    font-family: TangoCharlie;
+    src: url(./assets/RWATangoCharlie-Slanted.otf);
+}
+
+body {
+  background-color: black;
+  position: relative;
+}
+
+.title {
+  color: #F87EB1;
+  font-family: TangoCharlie;
+  font-size: 80px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.song-container-container {
+  position: absolute;
+  left: 50%;
+  top: 105px;
+  padding-left: 60px;
+  padding-right: 20px;
+  width: 35%;
+}
+
+.song-container {
+  position: relative;
+}
+
+.song {
+  color: #FCBDD7;
+  font-family: TangoCharlie;
+  font-size: 34px;
+  padding-top: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.playing {
+  color: #F87EB1;
+}
+
+.footer {
+  color: #FCBDD7;
+  font-family: TangoCharlie;
+  font-size: 24px;
+  position: absolute;
+  text-align: center;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  bottom: 20;
+}
+
+.link {
+  color: #F87EB1;
+  /*color: #FCBDD7;*/
+
+  text-decoration: none;
+}
