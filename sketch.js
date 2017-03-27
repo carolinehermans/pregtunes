@@ -1,109 +1,143 @@
-var sound, amplitude, cnv, level, images, maxFrame, timer, ctx, radius, loading;
-var imgBottom, imgTop, difference, numSongs, songs, numSongsLoaded, amountLoaded;
-var songPlayed, numImgsLoaded, numImgs;
+/* Global Variables */
+
+/* audio */
+var sound, amplitude;
+
+/* graphics */
+var cnv, radius;
+
+/* images */
+var images, imgNum, numImgsLoaded;
+
+/* songs */
+var songs, numSongsLoaded, songPlayed, prevSongNum;
+
+var numImgs = 64;
+var numImgsToLoad = 65;
+var numSongs = 12;
+var numSongsToLoad = 14;
+
+var firstSongToPlay = 11;
+
+/* loading callbacks */
 
 function successImg(img) {
   numImgsLoaded = numImgsLoaded + 1
-  if (numImgsLoaded == 65) {
+  if (numImgsLoaded == numImgsToLoad) {
     numSongsLoaded = numSongsLoaded + 1
   }
 }
 
-function success(thing) {
+function successSong(song) {
   numSongsLoaded = numSongsLoaded + 1
-  amountLoaded = int(100 * numSongsLoaded / numSongs)
+  amountLoaded = int(100 * numSongsLoaded / numSongsToLoad)
   document.getElementById("loading-animation").innerHTML = "Loading... " + str(amountLoaded) + "%"
 }
 
-function error(thing) {
+function handleLoadingComplete() {
+  loading = false;
+
+  /* init audio */
+  prevSongNum = firstSongToPlay;
+  firstSong = document.getElementById(str(firstSongToPlay))
+  firstSong.className += " playing"
+
+  if (!songPlayed) {
+    sound = songs[firstSongToPlay]
+    sound.play()
+    songPlayed = true;
+    document.getElementById("loading-animation").className = "invisible"
+    document.getElementById("content").className = "visible"
+  }
 }
 
-// function loading(percent){
-//   // amountLoaded = ((1.0 * numSongsLoaded / numSongs) + percent).toFixed(2)
-//   // document.getElementById("p5_loading").innerHTML = "Loading... " + str(amountLoaded) + "%"
-// }
-
 function changeSong(songNum) {
+  /* stop previous song, start new song */
   sound.stop()
   sound = songs[int(songNum)]
   sound.play()
+
+  /* update classes of elements */
   var id = songNum
   var elem = document.getElementById(id)
   var prevElem = document.getElementById(str(prevSongNum))
   elem.className += " playing"
   prevElem.className = "song"
-
   prevSongNum = songNum
-
 }
 
+
 function setup() {
+  /* hide content, display loading indicator */
   document.getElementById("loading-animation").className = "visible"
   document.getElementById("content").className = "invisible"
-  numImgs = 65
+
+  /* initializations */
+  loading = true
   songPlayed = false
-  maxFrame = 64
-  numSongs = 14;
   numSongsLoaded = 0;
   numImgsLoaded = 0;
-  prevSongNum = 4;
-  imgBottom = 0;
-  i = 0;
-  loading = true
+
+  imgNum = 0;
+  radius = 0;
+
   amplitude = new p5.Amplitude();
-  songs = []
   cnv = createCanvas(windowWidth, windowHeight - 150);
+
+  /* load songs */
+  i = 0;
+  songs = [];
   while (i <= numSongs) {
-    var snd = loadSound('assets/song' + i + ".mp3", success, error, loading)
+    var snd = loadSound('assets/song' + i + ".mp3", successSong)
     songs.push(snd)
     i++
   }
 
+  /* load images */
   i = 0;
- images = []
- while (i <= maxFrame) {
-   var img = loadImage("assets/images-cropped-bw/" + i + ".jpg", successImg, error, loading)
+  images = []
+  while (i <= numImgs) {
+   var img = loadImage("assets/images-cropped-bw/" + i + ".jpg", successImg)
    images.push(img)
    i++
- }
-
- firstSong = document.getElementById(str(prevSongNum))
- firstSong.className += " playing"
+  }
 
 }
 
 function draw() {
+  /* black background */
   background(0);
   fill(255);
-  if (numSongsLoaded == numSongs && numImgsLoaded == numImgs) {
-    loading = false;
-    if (!songPlayed) {
-      sound = songs[3]
-      songs[3].play()
-      songPlayed = true;
-      document.getElementById("loading-animation").className = "invisible"
-      document.getElementById("content").className = "visible"
+
+  if (loading) {
+    if (numSongsLoaded == numSongsToLoad && numImgsLoaded == numImgsToLoad) {
+      handleLoadingComplete();
+    } else {
+      return;
     }
   }
 
-  if (!loading) {
-    var level = amplitude.getLevel();
-    var imgFrac = map(level, 0, 0.7, maxFrame, 0);
-    if (abs(imgFrac - imgBottom) > 4) {
-      imgBottom = int(imgFrac)
-      imgTop = imgBottom + 1
-      difference = imgFrac - imgBottom
-      radius = 10 + level * 260
-    }
-    img = images[imgBottom]
-    var imageWidth = 2 * windowWidth / 5;
-    var imageHeight = 2 * windowWidth / 5;
-    image(img, windowWidth * .1, 30, imageWidth, imageHeight)
-    radius = 10 + level * imageWidth * 3 / 5
-    fill(248, 126, 177, 160);
-    noStroke();
-    bellyX = windowWidth * .1 + imageWidth / 2 - imageWidth * 3 / 100 ;
-    bellyY = 20 + imageWidth / 2 + imageWidth * 3 / 26;
-    ellipse(bellyX , bellyY, radius, radius);
+  var level = amplitude.getLevel();
+
+  var imgNumFrac = map(level, 0, 1, numImgs, 0);
+  /* if different enough, use a new frame */
+  if (abs(imgNumFrac - imgNum) > 2) {
+    imgNum = int(imgNumFrac)
+    radius = 10 + level * 260
   }
+
+  img = images[imgNum]
+
+  /* draw everything */
+  var imageWidth = 2 * windowWidth / 5;
+  var imageHeight = 2 * windowWidth / 5;
+  image(img, windowWidth * .1, 30, imageWidth, imageHeight)
+  radius = 10 + level * imageWidth * 3 / 5
+
+  fill(248, 126, 177, 160);
+  noStroke();
+  bellyX = windowWidth * .1 + imageWidth / 2 - imageWidth * 3 / 100 ;
+  bellyY = 20 + imageWidth / 2 + imageWidth * 3 / 26;
+  ellipse(bellyX , bellyY, radius, radius);
+
 }
