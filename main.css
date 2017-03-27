@@ -62,3 +62,24 @@ body {
 
   text-decoration: none;
 }
+
+#loading-animation {
+  color: #FCBDD7;
+  font-family: TangoCharlie;
+  font-size: 110px;
+  position: absolute;
+  top: 200;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  text-align: center;
+  margin: auto;
+}
+
+.invisible {
+  display: none;
+}
+
+.visible {
+  display: inline-block;
+}
