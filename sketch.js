@@ -14,10 +14,10 @@ var songs, numSongsLoaded, songPlayed, prevSongNum;
 
 var numImgs = 64;
 var numImgsToLoad = 65;
-var numSongs = 12;
-var numSongsToLoad = 14;
+var numSongs = 7;
+var numSongsToLoad = 9;
 
-var firstSongToPlay = 11;
+var firstSongToPlay = 6;
 
 /* loading callbacks */
 
